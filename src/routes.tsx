@@ -1,8 +1,9 @@
-import { createBrowserRouter } from "react-router-dom";
-import { Dashboard } from "./pages/app/dashboard";
-import { SignIn } from "./pages/auth/sign-in";
-import { AppLayout } from "./pages/_layouts/app";
-import { AuthLayout } from "./pages/_layouts/auth";
+import { createBrowserRouter } from 'react-router-dom'
+import { Dashboard } from './pages/app/dashboard'
+import { SignIn } from './pages/auth/sign-in'
+import { AppLayout } from './pages/_layouts/app'
+import { AuthLayout } from './pages/_layouts/auth'
+import { SignUp } from './pages/auth/sign-up'
 
 export const router = createBrowserRouter([
   {
@@ -11,9 +12,9 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Dashboard />
+        element: <Dashboard />,
       },
-    ]
+    ],
   },
   {
     path: '/',
@@ -21,8 +22,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/sign-in',
-        element: <SignIn />
-      }
-    ]
-  }
+        element: <SignIn />,
+      },
+      {
+        path: '/sign-up',
+        element: <SignUp />,
+      },
+    ],
+  },
 ])
