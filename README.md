@@ -1,1 +1,1 @@
-API: [Node.js API](https://github.com/rocketseat-education/pizzashop-api)
+API: [Bun API](https://github.com/rocketseat-education/pizzashop-api)
