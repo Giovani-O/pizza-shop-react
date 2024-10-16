@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from './ui/button'
 import {
@@ -12,7 +12,10 @@ import {
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
-import { getManagedRestaurant } from '@/api/get-managed-restaurant'
+import {
+  getManagedRestaurant,
+  GetManagedRestaurantResponse,
+} from '@/api/get-managed-restaurant'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { updateProfile } from '@/api/update-profile'
@@ -20,12 +23,14 @@ import { toast } from 'sonner'
 
 const storeProfileSchema = z.object({
   name: z.string().min(1),
-  description: z.string().optional(),
+  description: z.string().nullable(),
 })
 
 type StoreProfileSchema = z.infer<typeof storeProfileSchema>
 
 export function StoreProfileDialog() {
+  const queryClient = useQueryClient()
+
   const { data: managedRestaurant } = useQuery({
     queryKey: ['managed-restaurant'],
     queryFn: getManagedRestaurant,
@@ -44,8 +49,44 @@ export function StoreProfileDialog() {
     },
   })
 
+  // Mutação do cache
+  // usa useSuccess para atualizar os dados de uma requisição anterior através do sucesso de uma nova
+  function updateManagedRestaurantCache({
+    name,
+    description,
+  }: StoreProfileSchema) {
+    const cached = queryClient.getQueryData<GetManagedRestaurantResponse>([
+      'managed-restaurant',
+    ])
+
+    if (cached) {
+      queryClient.setQueryData<GetManagedRestaurantResponse>(
+        ['managed-restaurant'],
+        {
+          ...cached,
+          name,
+          description,
+        },
+      )
+    }
+
+    return { cached }
+  }
+
+  // onMutate é usado para a interface otimista (altera a informação na UI antes do banco)
+  // onError lida com possíveis erros
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateProfile,
+    onMutate({ name, description }) {
+      const { cached } = updateManagedRestaurantCache({ name, description })
+
+      return { previousProfile: cached }
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        updateManagedRestaurantCache(context.previousProfile)
+      }
+    },
   })
 
   async function handleUpdateProfile(data: StoreProfileSchema) {
