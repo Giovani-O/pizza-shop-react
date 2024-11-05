@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:test": "vite --port 8837 --mode test",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest --run"
@@ -49,10 +50,16 @@
     "autoprefixer": "^10.4.20",
     "globals": "^15.9.0",
     "happy-dom": "^15.8.4",
+    "msw": "^2.6.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.5.3",
     "vite": "^5.4.8",
     "vitest": "^2.1.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
